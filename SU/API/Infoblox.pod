@@ -1,0 +1,113 @@
+=head1 NAME
+
+SU::API::Infoblox
+
+=head1 SYNOPSIS
+
+    use strict;
+    use warnings;
+
+    use SU::API::Infoblox;
+
+    my $infoblox = new SU::API::Infoblox("fqdn","version");
+    $infoblox->login("username","password") or die $infoblox->login_status;
+
+    my $filter = "network=192.168.0.0/24";
+    my $result = $infoblox->do_request("GET", "network", $filter);
+    if (!$result) {
+        warn $infoblox->request_code;
+        warn $infoblox->request_status_line;
+    };
+
+    $infoblox->logout();
+
+=head1 DESCRIPTION
+
+Module used to integrate with the REST API (WAPI) that Infoblox provides.
+
+=head1 CONSTRUCTOR
+
+=over
+
+=item new (FQDN, VERSION)
+
+Returns a new SU::API::Infoblox object.
+
+=back
+
+=head1 METHODS
+
+=over
+
+=item login (USERNAME, PASSWORD)
+
+Configure and validate credantials.
+The "ibapauth" cookie is saved for further requests.
+
+=item logout
+
+Destroy the login session.
+
+=item login_status
+
+Returns a human readable login status of the current session.
+
+=item logged_in
+
+Returns true when logged in, otherwise returns undef.
+
+=item do_request (HTTP METHOD, URI, FILTER)
+
+Perform the actual request.
+
+"FILTER" is optional and can be any search filter that WAPI supports.
+
+Returns the result in JSON.
+
+=item request_code
+
+Returns the last HTTP status code.
+
+=item request_status_line
+
+Returns the last HTTP status line.
+
+=back
+
+=head1 DEPENDS
+
+L<LWP::UserAgent>,
+L<HTTP::Request>,
+L<URI::Escape>,
+L<JSON>
+
+=head1 LICENSE
+
+Copyright (c) 2016-, IT Services, Stockholm University
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials provided with the distribution.
+
+Neither the name of Stockholm University nor the names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 AUTHOR
+
+Johan Carlquist - <jocar@su.se>,
+Patrik Lundin - <patlu@su.se>
