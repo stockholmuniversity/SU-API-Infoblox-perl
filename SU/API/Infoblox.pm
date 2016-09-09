@@ -1,6 +1,6 @@
 package SU::API::Infoblox;
 
-use strict; 
+use strict;
 use warnings;
 
 use LWP::UserAgent;
