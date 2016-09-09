@@ -12,8 +12,8 @@ SU::API::Infoblox
     my $infoblox = new SU::API::Infoblox("fqdn","version");
     $infoblox->login("username","password") or die $infoblox->login_status;
 
-    my $filter = "network=192.168.0.0/24";
-    my $result = $infoblox->do_request("GET", "network", $filter);
+    my $params = "network=192.168.0.0/24";
+    my $result = $infoblox->do_request("GET", "network", $params);
     if (!$result) {
         warn $infoblox->request_code;
         warn $infoblox->request_status_line;
@@ -56,11 +56,11 @@ Returns a human readable login status of the current session.
 
 Returns true when logged in, otherwise returns undef.
 
-=item do_request (HTTP METHOD, URI, FILTER)
+=item do_request (HTTP METHOD, URI, PARAMS)
 
 Perform the actual request.
 
-"FILTER" is optional and can be any search filter that WAPI supports.
+"PARAMS" is optional and can be any parameters that WAPI supports.
 
 Returns the result in JSON.
 

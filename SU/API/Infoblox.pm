@@ -27,14 +27,14 @@ sub new {
 };
 
 sub do_request {
-    my ($self,$method,$object,$filter) = @_;
+    my ($self,$method,$object,$params) = @_;
 
-    if($filter) {
-        $filter = encode_filter($filter);
+    if($params) {
+        $params = encode_params($params);
     }
     my $req = HTTP::Request->new($method => "$self->{url}/${object}");
     $req->content_type('application/x-www-form-urlencoded');
-    $req->content($filter);
+    $req->content($params);
 
     $self->{res} = $self->{ua}->request($req);
 
@@ -49,17 +49,17 @@ sub do_request {
     return undef;
 };
 
-sub encode_filter {
-    my $filter = $_[0];
-    my @filter_array;
+sub encode_params {
+    my $params = $_[0];
+    my @params_array;
     my @encoded_uri_array;
 
-    if($filter =~ /&/) {
-        @filter_array = split('&',$filter);
+    if($params =~ /&/) {
+        @params_array = split('&',$params);
     } else {
-        @filter_array = $filter;
+        @params_array = $params;
     };
-    for(@filter_array) {
+    for(@params_array) {
         if($_ =~ /=/) {
             my ($argument,$value) = split("=",$_);
             push(@encoded_uri_array,join("=",uri_escape($argument),uri_escape($value)));
