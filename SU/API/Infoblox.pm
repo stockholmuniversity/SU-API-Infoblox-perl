@@ -27,20 +27,60 @@ sub new {
 };
 
 sub do_request {
-    my ($self,$method,$object,$filter) = @_;
+    my ($self,$method,$object,$params,$data) = @_;
 
-    if($filter) {
-        $filter = encode_filter($filter);
+    my $request_url;
+    my $content_type;
+    my $content;
+
+    if ($method eq "POST" or $method eq "PUT"){
+        if ($data) {
+           $data = encode_json($data);
+        }
+
+        $content_type = "application/json";
+        $content = $data;
+
+        # We want the POST and PUT calls to return JSON rather than a string.
+        if (! $params) {
+            $params = "_return_fields";
+        } else {
+            if ($params !~ /_return_fields/){
+                $params .= "&_return_fields";
+            }
+        }
+        $params = encode_params($params);
+        $request_url = "$self->{url}/${object}?$params";
+    } else {
+        if ($params) {
+            $params = encode_params($params);
+        }
+        $request_url = "$self->{url}/${object}";
+        $content_type = "application/x-www-form-urlencoded";
+        $content = $params;
     }
-    my $req = HTTP::Request->new($method => "$self->{url}/${object}");
-    $req->content_type('application/x-www-form-urlencoded');
-    $req->content($filter);
+
+    my $req = HTTP::Request->new($method => $request_url);
+    $req->content_type($content_type);
+    $req->content($content);
 
     $self->{res} = $self->{ua}->request($req);
 
     if (!$self->{res}->is_success) {
         return undef;
     };
+
+    # DELETE always returns the deleted ref as a string. We expect JSON.
+    # Just return an anonymous hash directly, which mimics the format of the decoded JSON.
+    if ($method eq "DELETE"){
+        # the _ref string in the raw "content" contains " signs. These are not present
+        # when we decode the JSON in the normal case.
+        my $ref_string = $self->{res}->content;
+        $ref_string =~ s/^"//;
+        $ref_string =~ s/"$//;
+        return {'_ref' => $ref_string};
+    }
+
     my $json_result = decode_json($self->{res}->content);
 
     if ($json_result) {
@@ -49,17 +89,17 @@ sub do_request {
     return undef;
 };
 
-sub encode_filter {
-    my $filter = $_[0];
-    my @filter_array;
+sub encode_params {
+    my $params = $_[0];
+    my @params_array;
     my @encoded_uri_array;
 
-    if($filter =~ /&/) {
-        @filter_array = split('&',$filter);
+    if($params =~ /&/) {
+        @params_array = split('&',$params);
     } else {
-        @filter_array = $filter;
+        @params_array = $params;
     };
-    for(@filter_array) {
+    for(@params_array) {
         if($_ =~ /=/) {
             my ($argument,$value) = split("=",$_);
             push(@encoded_uri_array,join("=",uri_escape($argument),uri_escape($value)));

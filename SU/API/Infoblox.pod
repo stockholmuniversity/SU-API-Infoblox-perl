@@ -12,9 +12,27 @@ SU::API::Infoblox
     my $infoblox = new SU::API::Infoblox("fqdn","version");
     $infoblox->login("username","password") or die $infoblox->login_status;
 
-    my $filter = "network=192.168.0.0/24";
-    my $result = $infoblox->do_request("GET", "network", $filter);
-    if (!$result) {
+    my $params = "network=192.168.0.0/24";
+    my $get_result = $infoblox->do_request("GET", "network", $params);
+    if (!$get_result) {
+        warn $infoblox->request_code;
+        warn $infoblox->request_status_line;
+    };
+
+    my $post_data = {
+        name     => "host.example.com",
+        ipv4addr => "func:nextavailableip:192.168.0.0/24",
+        mac      => "00:00:5e:00:53:00",
+    };
+
+    my $post_result = $infoblox->do_request("POST", "fixedaddress", "", $post_data);
+    if (!$post_result) {
+        warn $infoblox->request_code;
+        warn $infoblox->request_status_line;
+    };
+
+    my $delete_result = $infoblox->do_request("DELETE", "fixedaddress/am9jYXIgcGF0bHUgam9jYXIgcGF0bHUgam9jYXIgcGF0bHU");
+    if (!$delete_result) {
         warn $infoblox->request_code;
         warn $infoblox->request_status_line;
     };
@@ -56,13 +74,14 @@ Returns a human readable login status of the current session.
 
 Returns true when logged in, otherwise returns undef.
 
-=item do_request (HTTP METHOD, URI, FILTER)
+=item do_request (HTTP METHOD, URI, PARAMS, DATA)
 
 Perform the actual request.
 
-"FILTER" is optional and can be any search filter that WAPI supports.
+"PARAMS" is optional and can be any parameters that WAPI supports.
+"DATA" is optional and is a Perl data structure that will be converted to JSON.
 
-Returns the result in JSON.
+Returns the result in a perl reference.
 
 =item request_code
 
