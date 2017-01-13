@@ -41,16 +41,21 @@ sub do_request {
         $content_type = "application/json";
         $content = $data;
 
-        # We want the POST and PUT calls to return JSON rather than a string.
-        if (! $params) {
-            $params = "_return_fields";
+        # The 'request' object does not support URI arguments ($params) at all.
+        if ($object eq "request"){
+            $request_url = "$self->{url}/${object}";
         } else {
-            if ($params !~ /_return_fields/){
-                $params .= "&_return_fields";
+            # We want the POST and PUT calls to return JSON rather than a string.
+            if (! $params) {
+                $params = "_return_fields";
+            } else {
+                if ($params !~ /_return_fields/){
+                    $params .= "&_return_fields";
+                }
             }
+            $params = encode_params($params);
+            $request_url = "$self->{url}/${object}?$params";
         }
-        $params = encode_params($params);
-        $request_url = "$self->{url}/${object}?$params";
     } else {
         if ($params) {
             $params = encode_params($params);

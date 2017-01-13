@@ -37,6 +37,30 @@ SU::API::Infoblox
         warn $infoblox->request_status_line;
     };
 
+    my $request_post_data = [
+        {
+            method   => "GET",
+            object   => "record:a",
+            data     => {
+                name => "testrecord01.example.com"
+            },
+            assign_state => {
+                object_ref => "_ref"
+            },
+        },
+        {
+            method   => "DELETE",
+            object   => "##STATE:object_ref:##",
+            enable_substitution => JSON::true,
+        },
+    ];
+
+    my $request_post_result = $infoblox->do_request("POST", "request", "", $request_post_data);
+    if (!$request_post_result) {
+        warn $infoblox->request_code;
+        warn $infoblox->request_status_line;
+    };
+
     $infoblox->logout();
 
 =head1 DESCRIPTION
