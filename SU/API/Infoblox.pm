@@ -13,12 +13,15 @@ sub new {
     my $self = {
         hostname => shift,
         version  => shift,
+        timeout  => shift,
     };
 
     $self->{url} = "https://$self->{hostname}/wapi/v$self->{version}";
 
     $self->{ua} = LWP::UserAgent->new;
     $self->{ua}->cookie_jar( {} );
+
+    $self->{ua}->timeout($self->{timeout}) if $self->{timeout};
 
     $self->{login_status} = "not logged in";
 
