@@ -157,6 +157,11 @@ sub request_code {
     return $self->{res}->code;
 };
 
+sub request_content {
+    my ($self) = @_;
+    return $self->{res}->content;
+};
+
 sub request_status_line {
     my ($self) = @_;
     return $self->{res}->status_line;

@@ -17,6 +17,7 @@ SU::API::Infoblox
     if (!$get_result) {
         warn $infoblox->request_code;
         warn $infoblox->request_status_line;
+        warn $infoblox->request_content;
     };
 
     my $post_data = {
@@ -29,12 +30,14 @@ SU::API::Infoblox
     if (!$post_result) {
         warn $infoblox->request_code;
         warn $infoblox->request_status_line;
+        warn $infoblox->request_content;
     };
 
     my $delete_result = $infoblox->do_request("DELETE", "fixedaddress/am9jYXIgcGF0bHUgam9jYXIgcGF0bHUgam9jYXIgcGF0bHU");
     if (!$delete_result) {
         warn $infoblox->request_code;
         warn $infoblox->request_status_line;
+        warn $infoblox->request_content;
     };
 
     my $request_post_data = [
@@ -59,6 +62,7 @@ SU::API::Infoblox
     if (!$request_post_result) {
         warn $infoblox->request_code;
         warn $infoblox->request_status_line;
+        warn $infoblox->request_content;
     };
 
     $infoblox->logout();
